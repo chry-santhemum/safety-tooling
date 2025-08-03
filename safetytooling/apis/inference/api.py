@@ -651,7 +651,7 @@ class InferenceAPI:
         question: str,
         system_prompt: str | None = None,
         **api_kwargs,
-    ) -> list[str]:
+    ) -> list[LLMResponse]:
         """Wrapper around __call__ to ask a single question."""
         responses = await self(
             model_id=model_id,
@@ -666,7 +666,7 @@ class InferenceAPI:
             **api_kwargs,
         )
 
-        return [r.completion for r in responses]
+        return responses
 
     async def moderate(
         self,
