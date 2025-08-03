@@ -6,9 +6,9 @@ from pathlib import Path
 from traceback import format_exc
 from typing import Callable, List, Optional, Tuple
 
-import google.generativeai as genai
+from google import genai
 from google.api_core.exceptions import InvalidArgument
-from google.generativeai.types import GenerationConfig, HarmBlockThreshold, HarmCategory
+from google.genai.types import GenerationConfig, ThinkingConfig, HarmBlockThreshold, HarmCategory
 
 from safetytooling.data_models import GeminiStopReason, LLMResponse, Prompt
 
@@ -82,6 +82,12 @@ class GeminiModel(InferenceAPIModel):
             if k in kwargs:
                 kwargs[v] = kwargs[k]
                 del kwargs[k]
+        
+        if "thinking_tokens" in kwargs:
+            kwargs["thinking_config"] = ThinkingConfig(thinking_budget=kwargs["thinking_tokens"])
+        
+        del kwargs["thinking_tokens"]
+
         return GenerationConfig(**kwargs)
 
     def get_safety_settings(self, safety_threshold):
@@ -102,7 +108,7 @@ class GeminiModel(InferenceAPIModel):
         prompt: Prompt,
         safety_settings: dict[str, HarmBlockThreshold],
         generation_config: GenerationConfig = None,
-    ) -> Tuple[str, List[genai.types.file_types.File]]:
+    ) -> Tuple[str, List[genai.types.File]]:
         if not self.is_initialized:
             raise RuntimeError(
                 "Gemini is not initialized. Please set GOOGLE_API_KEY in .env before running your script"
@@ -274,7 +280,7 @@ class GeminiModel(InferenceAPIModel):
                 rate_tracker = self.rate_trackers[model_id]
                 if rate_tracker.can_make_request(GEMINI_RPM[model_id]):
                     rate_tracker.add_request(
-                        genai.GenerativeModel(model_name=model_id).count_tokens(prompt.gemini_format()).total_tokens
+                        genai.Client().models.count_tokens(model=model_id, contents="\n".join(prompt.gemini_format()[0]))
                     )
                 else:
                     return None

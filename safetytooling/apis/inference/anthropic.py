@@ -73,6 +73,13 @@ class AnthropicChatModel(InferenceAPIModel):
                 kwargs[v] = kwargs[k]
                 del kwargs[k]
 
+        if "thinking_tokens" in kwargs:
+            kwargs["thinking"] = {
+                "type": "enabled",
+                "budget_tokens": kwargs["thinking_tokens"],
+            }
+        del kwargs["thinking_tokens"]
+
         # Special case: ignore seed parameter since it's used for caching in safety-tooling
         # Other surplus parameters will still raise an error
         if "seed" in kwargs:

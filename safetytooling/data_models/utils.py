@@ -16,9 +16,19 @@ LOGGER = logging.getLogger(__name__)
 GEMINI_MODELS = {
     "gemini-1.5-flash-001",
     "gemini-1.5-pro-001",
+    "gemini-2.5-pro",
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
 }
 
-GEMINI_RPM = {"gemini-1.5-flash-001": 1000, "gemini-1.5-pro-001": 360}
+GEMINI_RPM = {
+    "gemini-1.5-flash-001": 1000,
+    "gemini-1.5-pro-001": 360,
+    # these are Tier 1
+    "gemini-2.5-pro": 150,
+    "gemini-2.5-flash": 1000,
+    "gemini-2.5-flash-lite": 4000,
+}
 GEMINI_TPM = 2000000
 
 DELETE_FILE_QUOTA = 500
